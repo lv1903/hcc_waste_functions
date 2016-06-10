@@ -464,6 +464,14 @@ module.exports = {
 	
 	next_nid: function(aNID, credentials, datasetID, qCache, callback){
 		
+		var fs = require("fs")
+		var access = fs.createWriteStream('node.access.log', { flags: 'a' })
+		var error = fs.createWriteStream('node.error.log', { flags: 'a' });
+
+		// redirect stdout / stderr
+		proc.stdout.pipe(access);
+		proc.stderr.pipe(error);
+		
 		var self = this;
 		
 		if(aNID.length > 0){
