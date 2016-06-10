@@ -2,14 +2,29 @@ var w = require("./hcc_waste_functions.js");
 
 var credentials = "B1xdinQcW:durley15";
 
-var output_datasetId = "B1bg6oLif";
+var datasetID = {};
 
-var ratio_datasetId = "rJZ0lHXoM";	
-var behaviour_datasetId = "SygHkQnuz";
+datasetID.nid_datasetId = "rkx-QLiEQ";
+datasetID.ratio_datasetId = "ByxjT0qNX";
+datasetID.behaviour_datasetId = "SylLs44d4";
+datasetID.displacements_datasetId = "B1eXxfjEX";
 
-var NID = "11111111111111111111000000";
+datasetID.tonnage_datasetId = "rJeTC5HON";
+datasetID.output_datasetId = "SkgFcSoEX";
 
-w.tonnage_by_HWRC_Waste_Contract_Move(NID, credentials, output_datasetId, ratio_datasetId, behaviour_datasetId, function(res){
-	console.log(res)
-});
+var NID = "00111000111111010010111111";
+// var NID = "11111111111111111111111111";
+
+//used to cache query data
+var qCache = {};		
+qCache.aRatio = [];
+qCache.aBase = [];
+
+console.log(NID + ": " + NID.length);
+
+if(NID.length == 26){
+	w.tonnage_by_HWRC_Waste_Contract_Move(NID, credentials, datasetID, qCache, function(res){
+		console.log(res)
+	});
+}
 

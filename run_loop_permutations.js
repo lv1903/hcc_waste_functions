@@ -2,12 +2,18 @@ var w = require("./hcc_waste_functions.js");
 
 var credentials = "B1xdinQcW:durley15";
 
+var datasetID = {};
 
-var	nid_datasetId = "S1ZiucIjM";
-var	tonnage_datasetId = "B1geUPvoz";
-var	ratio_datasetId = "rJZ0lHXoM";
-var	behaviour_datasetId = "SygHkQnuz";
+datasetID.nid_datasetId = "rkx-QLiEQ";
+datasetID.ratio_datasetId = "ByxjT0qNX";
+datasetID.behaviour_datasetId = "SkxeN1iVX";
+datasetID.displacements_datasetId = "B1eXxfjEX";
+datasetID.cost_datasetId = "HkehyysVm";
 
-w.run_NID_permutations(credentials, nid_datasetId, tonnage_datasetId, ratio_datasetId, behaviour_datasetId, function(res){
+datasetID.tonnage_datasetId = "H1xlB1yU7";
+datasetID.output_datasetId = "SkgFcSoEX";
+
+
+w.run_NID_permutations(credentials, datasetID, function(res){
 	console.log(res)
 });
