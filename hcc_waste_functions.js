@@ -48,6 +48,7 @@ module.exports = {
 		var aSID = ["2015", "2021"];
 		
 		// var oTest = {};
+		
 						
 		for(var sid_index in aSID){					
 			var sid = aSID[sid_index];					
@@ -63,7 +64,7 @@ module.exports = {
 					//extract the tonnage that matches the ratio record
 					for(behaviour_index in aBehaviour){							
 						
-						var o = aBehaviour[behaviour_index]._id;							
+						var o = aBehaviour[behaviour_index]._id;
 						
 						if(o.HWRC==hwrc){
 							if(o.Waste_Type==waste){
@@ -463,15 +464,7 @@ module.exports = {
 	},
 	
 	next_nid: function(aNID, credentials, datasetID, qCache, callback){
-		
-		var fs = require("fs")
-		var access = fs.createWriteStream('node.access.log', { flags: 'a' })
-		var error = fs.createWriteStream('node.error.log', { flags: 'a' });
 
-		// redirect stdout / stderr
-		proc.stdout.pipe(access);
-		proc.stderr.pipe(error);
-		
 		var self = this;
 		
 		if(aNID.length > 0){
@@ -503,12 +496,33 @@ module.exports = {
 			path: '/v1/datasets/' + datasetID.nid_datasetId + '/data?opts={"limit":1000000}'
 		};
 		
-		self.nqm_tbx_query(nid_options, function(res){			
-			var aNID = res[0].permutation_set;	
+		var tonnages_options = {
+			host: 'q.nqminds.com',
+			path: '/v1/datasets/' + datasetID.tonnage_datasetId + '/distinct?key=NID&opts={"limit":100000000}'
 			
-			self.next_nid(aNID, credentials, datasetID, qCache, function(res){
-				console.log(res)
-			});					
+		}
+		
+		self.nqm_tbx_query(tonnages_options, function(res){	
+			var aDone = res
+			self.nqm_tbx_query(nid_options, function(res){			
+				var aNID = res[0].permutation_set;	
+				
+				console.log("pre done-check NID " + aNID.length)
+				
+				// for(var done_index = 0; done_index < aDone.length; done_index ++){
+					// if(aNID.indexOf(aDone[done_index]) > -1){
+						// aNID.splice(aNID.indexOf(aDone[done_index]),1)
+					// }					
+				// }
+				
+				console.log("post done-check NID" + aNID.length)
+				
+				
+				self.next_nid(aNID, credentials, datasetID, qCache, function(res){
+					console.log(res)
+				});					
+			})
+			
 		})
 		
 	}

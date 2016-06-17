@@ -6,7 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "nqm-json-import": "^0.0.20",
+    "nqm-json-import": "*",
     "nqm-utils": "^0.0.7",
 	"request": "^2.72.0",
 	"util": "^0.10.3 "
