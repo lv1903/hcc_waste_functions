@@ -8,11 +8,12 @@ datasetID.nid_datasetId = "rkx-QLiEQ";
 datasetID.ratio_datasetId = "ByxjT0qNX";
 datasetID.behaviour_datasetId = "SylLs44d4";
 datasetID.displacements_datasetId = "B1eXxfjEX";
+datasetID.cost_datasetId = "HkehyysVm";
 
-datasetID.tonnage_datasetId = "rJeTC5HON";
+datasetID.tonnage_datasetId = "H1eCZDVWr";
 datasetID.output_datasetId = "SkgFcSoEX";
 
-var NID = "00111000111111010010111111";
+var NID = "00111000111111110111111111";
 // var NID = "11111111111111111111111111";
 
 //used to cache query data

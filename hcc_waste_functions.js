@@ -258,8 +258,8 @@ module.exports = {
 				var commandHost = "https://cmd.nqminds.com";
 				commands.getAccessToken(commandHost, credentials, function(err, accessToken){	
 					commands.upsertDatasetDataBulk(commandHost, accessToken, datasetID.tonnage_datasetId, data, function(res){	
-						console.log(res)
-						callback(NID, qCache)					
+						console.log("upsert res: " + res)
+						callback(res, NID, qCache)					
 					});	
 				});
 				
@@ -296,7 +296,7 @@ module.exports = {
 							commands.getAccessToken(commandHost, credentials, function(err, accessToken){	
 								commands.upsertDatasetDataBulk(commandHost, accessToken, datasetID.tonnage_datasetId, data, function(res){	
 									console.log(res)
-									callback(NID, qCache)					
+									callback(res, NID, qCache)					
 								})
 							});	
 						});
@@ -317,6 +317,11 @@ module.exports = {
 		var fail = [];
 		
 		for(var tonnage_index in aTonnage){
+			
+			if(tonnage_index % 10000 === 0 ){
+				console.log(tonnage_index)
+			}
+			
 			var t = aTonnage[tonnage_index];
 			
 			//find the matching cost record and apply cost per tonne to tonnage
@@ -393,17 +398,20 @@ module.exports = {
 		
 		var tonnage_options = {
 			host: 'q.nqminds.com',
-			path: '/v1/datasets/' + datasetID.tonnage_datasetId + '/data?opts={"limit":1000000}'
+			path: '/v1/datasets/' + datasetID.tonnage_datasetId + '/data?opts={"limit":1000}'
 		};	
 		
 		var aCost;
 		var aTonnage;		
 		
 		self.nqm_tbx_query(cost_options, function(aCost){	
+		
+			console.log("costs: " + aCost.length)
 			self.nqm_tbx_query(tonnage_options, function(aTonnage){
+				console.log("tonnages:" + aTonnage.length)
 				
 				var data = self.get_cost_by_HWRC_Waste_Contract_Move_data(aCost, aTonnage);
-				console.log(data.length)
+				console.log("data: " + data.length)
 			
 				var commandHost = "https://cmd.nqminds.com";					
 				commands.getAccessToken(commandHost, credentials, function(err, accessToken){	
@@ -463,19 +471,39 @@ module.exports = {
 		
 	},
 	
-	next_nid: function(aNID, credentials, datasetID, qCache, callback){
+	next_nid: function(aNID, credentials, datasetID, qCache, repeats, callback){
 
+		var fs = require('fs');
+		
 		var self = this;
 		
 		if(aNID.length > 0){
 			NID = aNID[aNID.length - 1];	
 			
 		
-			self.tonnage_by_HWRC_Waste_Contract_Move(NID, credentials, datasetID, qCache, function(nid, qCache){
-				var index = aNID.indexOf(nid);
-				if (index > -1) {aNID.splice(index, 1);}
-				console.log("Permutations left to run: " + aNID.length)
-				self.next_nid(aNID, credentials, datasetID, qCache, function(res){})
+			self.tonnage_by_HWRC_Waste_Contract_Move(NID, credentials, datasetID, qCache, function(res, nid, qCache){
+				// console.log(res)
+				// console.log(typeof(res))
+				
+				if(repeats > 5){
+					console.log("append to failed log");
+					fs.appendFile('failed_log.txt', nid + ",", function (err) {});
+				}
+				
+				
+				if(res == null || repeats > 5 ){
+					repeats = 0;
+					var index = aNID.indexOf(nid);
+					if (index > -1) {aNID.splice(index, 1);}
+					console.log("Permutations left to run: " + aNID.length)
+					
+					fs.writeFile('remaining_log.txt', "Permutations left to run: " + aNID.length, function (err) {});
+					
+					self.next_nid(aNID, credentials, datasetID, qCache, repeats, function(res){})
+				} else {
+					console.log(repeats + 1 + " repeats")
+					self.next_nid(aNID, credentials, datasetID, qCache, repeats + 1, function(res){})
+				}
 			});
 		} else {
 			callback("all tonnage permutations calculated and imported")
@@ -503,22 +531,25 @@ module.exports = {
 		}
 		
 		self.nqm_tbx_query(tonnages_options, function(res){	
-			var aDone = res
+			var aDone = res			
+			// console.log(aDone)
 			self.nqm_tbx_query(nid_options, function(res){			
 				var aNID = res[0].permutation_set;	
 				
 				console.log("pre done-check NID " + aNID.length)
 				
-				// for(var done_index = 0; done_index < aDone.length; done_index ++){
-					// if(aNID.indexOf(aDone[done_index]) > -1){
-						// aNID.splice(aNID.indexOf(aDone[done_index]),1)
-					// }					
-				// }
+				//console.log(aNID[0])
+				
+				for(var done_index = 0; done_index < aDone.length; done_index ++){
+					if(aNID.indexOf(aDone[done_index]) > -1){
+						aNID.splice(aNID.indexOf(aDone[done_index]),1)
+					}					
+				}
 				
 				console.log("post done-check NID" + aNID.length)
 				
-				
-				self.next_nid(aNID, credentials, datasetID, qCache, function(res){
+			
+				self.next_nid(aNID, credentials, datasetID, qCache, 0, function(res){
 					console.log(res)
 				});					
 			})

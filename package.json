@@ -9,7 +9,17 @@
     "nqm-json-import": "*",
     "nqm-utils": "^0.0.7",
 	"request": "^2.72.0",
-	"util": "^0.10.3 "
+	"util": "^0.10.3 ",
+
+    "csvtojson": "^0.5.14",
+    "debug": "^2.2.0",
+    "lodash": "^4.13.0",
+    "minimist": "^1.2.0",
+    "multer": "^1.1.0",
+    "nqm-api-tdx": "git+https://github.com/nqminds/nqm-api-tdx.git",
+    "nqm-utils": "0.0.7",
+    "passport-local": "^1.0.0",
+    "request": "^2.72.0"
 	
   }
 }
